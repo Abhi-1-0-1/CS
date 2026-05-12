@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python File Handling — Class 12 CS Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #171b26;
+    --surface2: #1e2330;
+    --surface3: #252b3b;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #8892a4;
+    --dim: #5a6478;
+
+    --blue: #4f8ef7;
+    --blue-dim: rgba(79,142,247,0.12);
+    --blue-glow: rgba(79,142,247,0.25);
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.1);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.1);
+    --coral: #f97316;
+    --coral-dim: rgba(249,115,22,0.1);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.1);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.1);
+    --pink: #ec4899;
+    --pink-dim: rgba(236,72,153,0.1);
+    --red: #ef4444;
+    --red-dim: rgba(239,68,68,0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    padding: 60px 40px 48px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .page-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(79,142,247,0.15), transparent);
+    pointer-events: none;
+  }
+  .chapter-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 14px;
+  }
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(32px, 5vw, 54px);
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .page-title em {
+    color: var(--blue);
+    font-style: italic;
+  }
+  .page-subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 300;
+  }
+  .toc-pills {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center;
+    margin-top: 28px;
+  }
+  .toc-pill {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 12px; font-weight: 500;
+    cursor: pointer;
+    border: 1px solid;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .toc-pill:hover { opacity: 0.75; }
+  .pill-text  { border-color: rgba(79,142,247,0.35); background: var(--blue-dim); color: var(--blue); }
+  .pill-bin   { border-color: rgba(245,158,11,0.35); background: var(--amber-dim); color: var(--amber); }
+  .pill-csv   { border-color: rgba(34,197,94,0.35);  background: var(--green-dim); color: var(--green); }
+
+  /* ── LAYOUT ── */
+  .content { max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── SECTION HEADERS ── */
+  .section-divider {
+    margin: 64px 0 0;
+    padding: 40px 36px 36px;
+    border-radius: 16px;
+    border: 1px solid;
+    position: relative;
+    overflow: hidden;
+  }
+  .section-divider::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 220px; height: 100%;
+    background: linear-gradient(to left, currentColor, transparent);
+    opacity: 0.03;
+    pointer-events: none;
+  }
+  .sd-text  { border-color: rgba(79,142,247,0.3);  background: var(--blue-dim); }
+  .sd-bin   { border-color: rgba(245,158,11,0.3);  background: var(--amber-dim); }
+  .sd-csv   { border-color: rgba(34,197,94,0.3);   background: var(--green-dim); }
+
+  .section-icon {
+    font-size: 36px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .section-num {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .sd-text  .section-num { color: var(--blue); }
+  .sd-bin   .section-num { color: var(--amber); }
+  .sd-csv   .section-num { color: var(--green); }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 30px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .section-desc { color: var(--muted); font-size: 14px; }
+
+  /* ── SUB-SECTION ── */
+  .subsection { margin-top: 40px; }
+  .subsection-title {
+    font-size: 17px; font-weight: 600;
+    color: var(--text);
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .subsection-title .dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dot-blue   { background: var(--blue); }
+  .dot-amber  { background: var(--amber); }
+  .dot-green  { background: var(--green); }
+  .dot-teal   { background: var(--teal); }
+  .dot-purple { background: var(--purple); }
+  .dot-coral  { background: var(--coral); }
+
+  /* ── PROSE ── */
+  p { color: var(--muted); margin-bottom: 14px; }
+  p:last-child { margin-bottom: 0; }
+  strong { color: var(--text); font-weight: 500; }
+
+  /* ── TABLES ── */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: 12px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead tr { background: var(--surface2); }
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--muted);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  td:first-child { color: var(--text); }
+
+  /* ── CODE ── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: var(--surface3);
+    padding: 2px 6px;
+    border-radius: 5px;
+    color: var(--teal);
+  }
+  pre {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    overflow-x: auto;
+    margin: 18px 0;
+    position: relative;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.75;
+  }
+  .pre-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .kw  { color: var(--purple); }
+  .fn  { color: var(--blue); }
+  .st  { color: var(--amber); }
+  .cm  { color: var(--dim); font-style: italic; }
+  .num { color: var(--coral); }
+
+  /* ── CALLOUT BOXES ── */
+  .callout {
+    padding: 16px 20px;
+    border-radius: 10px;
+    border-left: 3px solid;
+    margin: 18px 0;
+    font-size: 14px;
+  }
+  .callout-title {
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .callout p { margin: 0; font-size: 14px; }
+
+  .callout-note    { background: var(--blue-dim);   border-color: var(--blue);   }
+  .callout-note    .callout-title { color: var(--blue); }
+  .callout-warning { background: var(--amber-dim);  border-color: var(--amber);  }
+  .callout-warning .callout-title { color: var(--amber); }
+  .callout-tip     { background: var(--teal-dim);   border-color: var(--teal);   }
+  .callout-tip     .callout-title { color: var(--teal); }
+  .callout-danger  { background: var(--red-dim);    border-color: var(--red);    }
+  .callout-danger  .callout-title { color: var(--red); }
+
+  /* ── CARD GRID ── */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card-icon { font-size: 22px; margin-bottom: 10px; }
+  .card-title { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 6px; }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .badge-blue   { background: var(--blue-dim);   color: var(--blue);   }
+  .badge-amber  { background: var(--amber-dim);  color: var(--amber);  }
+  .badge-green  { background: var(--green-dim);  color: var(--green);  }
+  .badge-teal   { background: var(--teal-dim);   color: var(--teal);   }
+  .badge-purple { background: var(--purple-dim); color: var(--purple); }
+  .badge-coral  { background: var(--coral-dim);  color: var(--coral);  }
+  .badge-red    { background: var(--red-dim);    color: var(--red);    }
+
+  /* ── UML / FLOW ── */
+  .flow-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .flow-arrow {
+    text-align: center;
+    color: var(--dim);
+    font-size: 18px;
+    padding: 4px 0;
+  }
+
+  /* ── POINTER TABLE ── */
+  .pointer-visual {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 24px;
+    margin: 18px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+
+  /* ── DIFF TABLE ── */
+  .diff-table td:nth-child(2) { color: var(--blue);  }
+  .diff-table td:nth-child(3) { color: var(--amber); }
+
+  /* ── MODE PILL in table ── */
+  .mode { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text); }
+
+  /* ── STEPS ── */
+  .steps { margin: 18px 0; }
+  .step {
+    display: flex; gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--surface3);
+    color: var(--muted);
+    font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-text { color: var(--muted); font-size: 14px; }
+  .step-text strong { color: var(--text); }
+
+  /* ── COMPARE CARDS ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
+  @media (max-width: 580px) { .compare { grid-template-columns: 1fr; } }
+  .compare-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .compare-card-title {
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .compare-card ul { padding-left: 18px; }
+  .compare-card li { color: var(--muted); font-size: 13px; margin-bottom: 5px; }
+
+  /* ── SUMMARY STRIP ── */
+  .summary-strip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 28px 0;
+  }
+  .summary-strip h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--dim); margin-bottom: 12px; }
+  .strip-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .strip-item {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+  .strip-item code { background: none; padding: 0; font-size: 13px; }
+  .strip-item .arr { color: var(--dim); margin: 0 6px; }
+
+  hr.divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<header class="page-header">
+  <div class="chapter-label">Class 12 · Computer Science · Python</div>
+  <h1 class="page-title">File <em>Handling</em> in Python</h1>
+  <p class="page-subtitle">Complete revision notes — Text Files · Binary Files · CSV Files</p>
+  <div class="toc-pills">
+    <a href="#text-files"   class="toc-pill pill-text">📄 Text Files</a>
+    <a href="#binary-files" class="toc-pill pill-bin">🗂 Binary Files</a>
+    <a href="#csv-files"    class="toc-pill pill-csv">📊 CSV Files</a>
+  </div>
+</header>
+
+<!-- ══════════ CONTENT ══════════ -->
+<main class="content">
+
+<!-- ─────────────────────────────────────────── -->
+<!-- SECTION 1: TEXT FILES -->
+<!-- ─────────────────────────────────────────── -->
+<div id="text-files" class="section-divider sd-text">
+  <div class="section-icon">📄</div>
+  <div class="section-num">Section 01</div>
+  <h2 class="section-title">Text Files</h2>
+  <p class="section-desc">Human-readable files where data is stored as a sequence of characters, with each line ending in a newline character <code>\n</code>.</p>
+</div>
+
+<!-- 1.1 Key Characteristics -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-blue"></span>Key Characteristics</h3>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">👁</div>
+      <div class="card-title">Human Readable</div>
+      <div class="card-desc">Can be opened and edited in any plain text editor like Notepad or VS Code.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔁</div>
+      <div class="card-title">EOL Translation</div>
+      <div class="card-desc">Internal translation happens during read/write — the EOL character <code>\n</code> is handled automatically.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔓</div>
+      <div class="card-title">Less Secure</div>
+      <div class="card-desc">Generally considered less safe than binary files because they can be easily read and edited.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 1.2 Opening & Closing -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-blue"></span>Opening & Closing Files</h3>
+  <p>The <code>open()</code> function creates a <strong>file object</strong> that links Python to a physical file on disk.</p>
+
+  <div class="pre-label">Syntax</div>
+  <pre><code><span class="kw">file_obj</span> = <span class="fn">open</span>(<span class="st">"filename.txt"</span>, <span class="st">"mode"</span>)
+<span class="kw">file_obj</span>.<span class="fn">close</span>()   <span class="cm"># Always close to free memory</span></code></pre>
+
+  <div class="callout callout-tip">
+    <div class="callout-title">💡 Best Practice — use <code>with</code></div>
+    <p>The <code>with</code> statement automatically closes the file when the block ends, even if an exception occurs. Always prefer it over manual <code>close()</code>.</p>
+  </div>
+
+  <div class="pre-label">Using the with clause</div>
+  <pre><code><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"data.txt"</span>, <span class="st">"r"</span>) <span class="kw">as</span> f:
+    content = f.<span class="fn">read</span>()
+<span class="cm"># File is automatically closed here — no need for f.close()</span></code></pre>
+</div>
+
+<!-- 1.3 File Access Modes -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-blue"></span>File Access Modes</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Mode</th>
+          <th>Name</th>
+          <th>Pointer Position</th>
+          <th>If File Missing</th>
+          <th>Key Behaviour</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="mode badge badge-blue">'r'</span></td>
+          <td>Read</td>
+          <td>Beginning</td>
+          <td><span class="badge badge-red">Raises IOError</span></td>
+          <td>Default mode. Read-only.</td>
+        </tr>
+        <tr>
+          <td><span class="mode badge badge-coral">'w'</span></td>
+          <td>Write</td>
+          <td>Beginning</td>
+          <td><span class="badge badge-green">Creates file</span></td>
+          <td><strong>Truncates</strong> (erases) all existing data immediately.</td>
+        </tr>
+        <tr>
+          <td><span class="mode badge badge-teal">'a'</span></td>
+          <td>Append</td>
+          <td>End of file</td>
+          <td><span class="badge badge-green">Creates file</span></td>
+          <td>New data added after existing content — never overwrites.</td>
+        </tr>
+        <tr>
+          <td><span class="mode badge badge-purple">'r+'</span></td>
+          <td>Read & Write</td>
+          <td>Beginning</td>
+          <td><span class="badge badge-red">Raises IOError</span></td>
+          <td>Both operations allowed; file must already exist.</td>
+        </tr>
+        <tr>
+          <td><span class="mode badge badge-coral">'w+'</span></td>
+          <td>Write & Read</td>
+          <td>Beginning</td>
+          <td><span class="badge badge-green">Creates file</span></td>
+          <td><strong>Truncates</strong> existing data; useful to overwrite then read back.</td>
+        </tr>
+        <tr>
+          <td><span class="mode badge badge-teal">'a+'</span></td>
+          <td>Append & Read</td>
+          <td>End of file</td>
+          <td><span class="badge badge-green">Creates file</span></td>
+          <td>Pointer at end for writing; use <code>seek(0)</code> to read from start.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-warning">
+    <div class="callout-title">⚠ Watch Out</div>
+    <p><code>'w'</code> and <code>'w+'</code> truncate the file the moment they open it — all existing data is lost instantly, even before you write anything new.</p>
+  </div>
+</div>
+
+<!-- 1.4 Reading Functions -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-blue"></span>Reading Functions</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Function</th><th>Reads</th><th>Returns</th><th>Critical Nuance</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>read()</code></td>
+          <td>Entire file</td>
+          <td>String</td>
+          <td>Includes <strong>every</strong> character — spaces, tabs, <code>\n</code></td>
+        </tr>
+        <tr>
+          <td><code>read(n)</code></td>
+          <td><code>n</code> characters from current pointer</td>
+          <td>String</td>
+          <td><code>n</code> counts spaces and <code>\n</code> as characters too</td>
+        </tr>
+        <tr>
+          <td><code>readline()</code></td>
+          <td>One line</td>
+          <td>String</td>
+          <td>Includes the trailing <code>\n</code></td>
+        </tr>
+        <tr>
+          <td><code>readline(n)</code></td>
+          <td><code>n</code> characters from current line</td>
+          <td>String</td>
+          <td>Stops at line boundary even if <code>n</code> is larger</td>
+        </tr>
+        <tr>
+          <td><code>readlines()</code></td>
+          <td>All lines</td>
+          <td><strong>List of strings</strong></td>
+          <td>Each element retains its <code>\n</code> — strip before printing</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 1.5 Writing Functions -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-blue"></span>Writing Functions</h3>
+  <div class="compare">
+    <div class="compare-card">
+      <div class="compare-card-title"><span class="badge badge-blue">write(string)</span></div>
+      <ul>
+        <li>Writes a <strong>single string</strong> to the file</li>
+        <li>Does <strong>not</strong> add <code>\n</code> automatically</li>
+        <li>You must include <code>\n</code> manually if needed</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <div class="compare-card-title"><span class="badge badge-teal">writelines(list)</span></div>
+      <ul>
+        <li>Writes a <strong>list of strings</strong></li>
+        <li>Does <strong>not</strong> add newlines between elements</li>
+        <li>Faster for bulk writes</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pre-label">Example — write vs writelines</div>
+  <pre><code><span class="kw">with</span> <span class="fn">open</span>(<span class="st">"out.txt"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(<span class="st">"Hello\n"</span>)              <span class="cm"># Must add \n manually</span>
+    f.<span class="fn">writelines</span>([<span class="st">"Line1\n"</span>, <span class="st">"Line2\n"</span>])  <span class="cm"># \n must be in the list items</span></code></pre>
+</div>
+
+<!-- 1.6 seek & tell -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-blue"></span>File Pointer Navigation — <code>seek()</code> & <code>tell()</code></h3>
+  <p>The <strong>file pointer</strong> marks where the next read or write will happen. You can move it manually.</p>
+
+  <div class="pointer-visual">
+    <div style="color:var(--muted);margin-bottom:12px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase">File contents</div>
+    <div style="display:flex;gap:0;font-size:13px;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+      <div style="padding:10px 14px;border-right:1px solid var(--border);background:var(--surface2)">H</div>
+      <div style="padding:10px 14px;border-right:1px solid var(--border);background:var(--surface2)">e</div>
+      <div style="padding:10px 14px;border-right:1px solid var(--border);background:var(--surface2)">l</div>
+      <div style="padding:10px 14px;border-right:1px solid var(--border);background:var(--surface3);color:var(--blue)">l</div>
+      <div style="padding:10px 14px;border-right:1px solid var(--border);background:var(--surface2)">o</div>
+      <div style="padding:10px 14px;border-right:1px solid var(--border);background:var(--surface2)">\n</div>
+      <div style="padding:10px 14px;border-right:1px solid var(--border);background:var(--surface2)">W</div>
+      <div style="padding:10px 14px;background:var(--surface2)">…</div>
+    </div>
+    <div style="display:flex;gap:0;margin-top:4px">
+      <div style="width:14px;text-align:center;margin-left:0;color:var(--dim);font-size:10px">0</div>
+      <div style="width:42px;text-align:center;color:var(--dim);font-size:10px">1</div>
+      <div style="width:42px;text-align:center;color:var(--dim);font-size:10px">2</div>
+      <div style="width:42px;text-align:center;color:var(--blue);font-size:10px;font-weight:600">3 ← tell()</div>
+    </div>
+  </div>
+
+  <div class="table-wrap" style="margin-top:16px">
+    <table>
+      <thead>
+        <tr><th>Function</th><th>Purpose</th><th>Returns</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>tell()</code></td>
+          <td>Returns current pointer position in bytes from start</td>
+          <td>Integer (byte offset)</td>
+        </tr>
+        <tr>
+          <td><code>seek(offset, 0)</code></td>
+          <td>Move pointer <code>offset</code> bytes from <strong>beginning</strong></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>seek(offset, 1)</code></td>
+          <td>Move pointer <code>offset</code> bytes from <strong>current position</strong></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>seek(offset, 2)</code></td>
+          <td>Move pointer <code>offset</code> bytes from <strong>end of file</strong></td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-note">
+    <div class="callout-title">📌 Key Point</div>
+    <p>In <code>'a+'</code> mode the pointer starts at the <strong>end</strong> of the file. Call <code>seek(0)</code> first before trying to read from the beginning.</p>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<!-- SECTION 2: BINARY FILES -->
+<!-- ─────────────────────────────────────────── -->
+<div id="binary-files" class="section-divider sd-bin" style="margin-top:72px">
+  <div class="section-icon">🗂</div>
+  <div class="section-num">Section 02</div>
+  <h2 class="section-title">Binary Files</h2>
+  <p class="section-desc">Stores data in the same format as memory — no character translation. Used to save Python objects like lists and dictionaries using the <code>pickle</code> module.</p>
+</div>
+
+<!-- 2.1 vs Text -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-amber"></span>Binary vs Text — At a Glance</h3>
+  <div class="table-wrap">
+    <table class="diff-table">
+      <thead><tr><th>Property</th><th>Text File</th><th>Binary File</th></tr></thead>
+      <tbody>
+        <tr><td>Storage format</td><td>Characters (ASCII/UTF-8)</td><td>Raw bytes (same as memory)</td></tr>
+        <tr><td>EOL translation</td><td>Yes — <code>\n</code> translated</td><td>No translation at all</td></tr>
+        <tr><td>Human readable</td><td>Yes</td><td>No</td></tr>
+        <tr><td>Python objects</td><td>Need manual conversion</td><td>Direct via <code>pickle</code></td></tr>
+        <tr><td>File modes</td><td><code>r w a r+ w+ a+</code></td><td><code>rb wb ab rb+ wb+ ab+</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 2.2 pickle -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-amber"></span>The <code>pickle</code> Module</h3>
+  <p>To store or retrieve Python objects (lists, dicts, tuples, etc.) from a binary file, you use <code>pickle</code>.</p>
+
+  <div class="compare">
+    <div class="compare-card">
+      <div class="compare-card-title" style="color:var(--amber)">🔽 Pickling (Serialization)</div>
+      <ul>
+        <li>Converts a Python object → byte stream</li>
+        <li>Function: <code>pickle.dump(data, file)</code></li>
+        <li>File must be opened in <strong>write binary</strong> mode: <code>'wb'</code></li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <div class="compare-card-title" style="color:var(--teal)">🔼 Unpickling (Deserialization)</div>
+      <ul>
+        <li>Converts byte stream → Python object</li>
+        <li>Function: <code>pickle.load(file)</code></li>
+        <li>File must be opened in <strong>read binary</strong> mode: <code>'rb'</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pre-label">Writing a binary file</div>
+  <pre><code><span class="kw">import</span> pickle
+
+student = {<span class="st">"name"</span>: <span class="st">"Aanya"</span>, <span class="st">"roll"</span>: <span class="num">42</span>, <span class="st">"grade"</span>: <span class="st">"A"</span>}
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"student.dat"</span>, <span class="st">"wb"</span>) <span class="kw">as</span> f:
+    pickle.<span class="fn">dump</span>(student, f)    <span class="cm"># Serialise and save</span></code></pre>
+
+  <div class="pre-label">Reading a binary file (handling EOF)</div>
+  <pre><code><span class="kw">import</span> pickle
+
+<span class="kw">def</span> <span class="fn">DisplayAll</span>():
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"student.dat"</span>, <span class="st">"rb"</span>) <span class="kw">as</span> f:
+        <span class="kw">try</span>:
+            <span class="kw">while</span> <span class="kw">True</span>:
+                R = pickle.<span class="fn">load</span>(f)   <span class="cm"># Reads ONE object at a time</span>
+                <span class="fn">print</span>(R)
+        <span class="kw">except</span> EOFError:            <span class="cm"># Raised when file ends</span>
+            <span class="kw">pass</span></code></pre>
+
+  <div class="callout callout-danger">
+    <div class="callout-title">🚨 Must Know — EOFError</div>
+    <p>Binary files with multiple pickled objects require a <code>try…except EOFError</code> loop. When <code>pickle.load()</code> reaches the end of the file, it raises <code>EOFError</code> — without catching it, your program will crash.</p>
+  </div>
+</div>
+
+<!-- 2.3 CRUD Operations -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-amber"></span>CRUD Operations on Binary Files</h3>
+
+  <!-- Search -->
+  <div style="margin-bottom:24px">
+    <div style="font-weight:600;font-size:14px;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px"><span class="badge badge-blue">Search</span></div>
+    <p>Iterate through all records and compare the target field against each record.</p>
+    <div class="pre-label">Search by roll number</div>
+    <pre><code><span class="kw">def</span> <span class="fn">Search</span>(target):
+    found = <span class="kw">False</span>
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"student.dat"</span>, <span class="st">"rb"</span>) <span class="kw">as</span> f:
+        <span class="kw">try</span>:
+            <span class="kw">while</span> <span class="kw">True</span>:
+                R = pickle.<span class="fn">load</span>(f)
+                <span class="kw">if</span> R[<span class="st">"roll"</span>] == target:
+                    <span class="fn">print</span>(<span class="st">"Found:"</span>, R)
+                    found = <span class="kw">True</span>
+        <span class="kw">except</span> EOFError:
+            <span class="kw">pass</span>
+    <span class="kw">if not</span> found:
+        <span class="fn">print</span>(<span class="st">"Record not found"</span>)</code></pre>
+  </div>
+
+  <!-- Update / Delete Logic -->
+  <div>
+    <div style="font-weight:600;font-size:14px;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px">
+      <span class="badge badge-amber">Update</span><span class="badge badge-red">Delete</span>
+    </div>
+    <p>Since you can't edit a binary file in-place, you use the <strong>Temporary File Method</strong>:</p>
+
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-text">Open original in <strong>rb</strong> and a new <code>temp.dat</code> in <strong>wb</strong></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Loop through all records using <code>pickle.load()</code></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong>Update:</strong> modify the matching record, then <code>pickle.dump()</code> to temp &nbsp;|&nbsp; <strong>Delete:</strong> simply skip the target record</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Close both files</div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-text">Use <code>os.remove("original.dat")</code> then <code>os.rename("temp.dat", "original.dat")</code></div></div>
+    </div>
+
+    <div class="pre-label">Delete template</div>
+    <pre><code><span class="kw">import</span> pickle, os
+
+<span class="kw">def</span> <span class="fn">Delete</span>(target_roll):
+    records = []
+    <span class="cm"># Step 1: Load all records</span>
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"student.dat"</span>, <span class="st">"rb"</span>) <span class="kw">as</span> f:
+        <span class="kw">try</span>:
+            <span class="kw">while</span> <span class="kw">True</span>:
+                records.<span class="fn">append</span>(pickle.<span class="fn">load</span>(f))
+        <span class="kw">except</span> EOFError:
+            <span class="kw">pass</span>
+
+    <span class="cm"># Step 2: Write back — skipping the target</span>
+    <span class="kw">with</span> <span class="fn">open</span>(<span class="st">"temp.dat"</span>, <span class="st">"wb"</span>) <span class="kw">as</span> f:
+        <span class="kw">for</span> R <span class="kw">in</span> records:
+            <span class="kw">if</span> R[<span class="st">"roll"</span>] != target_roll:
+                pickle.<span class="fn">dump</span>(R, f)
+
+    <span class="cm"># Step 3: Replace original</span>
+    os.<span class="fn">remove</span>(<span class="st">"student.dat"</span>)
+    os.<span class="fn">rename</span>(<span class="st">"temp.dat"</span>, <span class="st">"student.dat"</span>)</code></pre>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<!-- SECTION 3: CSV FILES -->
+<!-- ─────────────────────────────────────────── -->
+<div id="csv-files" class="section-divider sd-csv" style="margin-top:72px">
+  <div class="section-icon">📊</div>
+  <div class="section-num">Section 03</div>
+  <h2 class="section-title">CSV Files</h2>
+  <p class="section-desc">Comma Separated Values — a plain-text format for tabular data, handled in Python via the built-in <code>csv</code> module.</p>
+</div>
+
+<!-- 3.1 Key Characteristics -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-green"></span>Key Characteristics</h3>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <div class="card-title">Tabular Format</div>
+      <div class="card-desc">Stores data in rows and columns — exactly like a spreadsheet — using plain ASCII text.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Lightweight</div>
+      <div class="card-desc">Smaller in size and faster to process compared to full spreadsheet formats.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔁</div>
+      <div class="card-title">Character Translation</div>
+      <div class="card-desc">Like text files, EOL translation occurs during read/write operations.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔓</div>
+      <div class="card-title">Less Secure</div>
+      <div class="card-desc">Plain text — easily opened and modified without special software.</div>
+    </div>
+  </div>
+</div>
+
+<!-- 3.2 Opening CSV Files -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-green"></span>Opening CSV Files — The Crucial Nuance</h3>
+  <div class="callout callout-danger">
+    <div class="callout-title">🚨 Critical — newline='' when Writing</div>
+    <p>When opening a CSV file for <strong>writing</strong>, always pass <code>newline=''</code>. Without it, Python inserts an extra blank line between every row because of how Windows handles line endings.</p>
+  </div>
+  <div class="compare">
+    <div class="compare-card">
+      <div class="compare-card-title" style="color:var(--green)">Writing</div>
+      <pre style="margin:0;padding:10px 14px;font-size:12px"><code>F = <span class="fn">open</span>(<span class="st">"data.csv"</span>, <span class="st">'w'</span>, <span class="kw">newline</span>=<span class="st">''</span>)</code></pre>
+    </div>
+    <div class="compare-card">
+      <div class="compare-card-title" style="color:var(--blue)">Reading</div>
+      <pre style="margin:0;padding:10px 14px;font-size:12px"><code>F = <span class="fn">open</span>(<span class="st">"data.csv"</span>, <span class="st">'r'</span>)</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- 3.3 Writing -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-green"></span>Writing to a CSV File</h3>
+  <p>Create a <strong>writer object</strong> first, then use it to write rows.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Function</th><th>Input</th><th>Writes</th><th>Nuance</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>csv.writer(file, delimiter)</code></td>
+          <td>File object</td>
+          <td>Writer object</td>
+          <td>Default delimiter is comma <code>','</code></td>
+        </tr>
+        <tr>
+          <td><code>writerow(list)</code></td>
+          <td>A single List</td>
+          <td>One row</td>
+          <td>Each list element becomes one field</td>
+        </tr>
+        <tr>
+          <td><code>writerows(nested_list)</code></td>
+          <td>List of lists</td>
+          <td>Multiple rows at once</td>
+          <td>Best for bulk/batch writing</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pre-label">Write example</div>
+  <pre><code><span class="kw">import</span> csv
+
+data = [
+    [<span class="st">"Name"</span>, <span class="st">"Roll"</span>, <span class="st">"Grade"</span>],
+    [<span class="st">"Aanya"</span>, <span class="num">1</span>, <span class="st">"A"</span>],
+    [<span class="st">"Rohan"</span>, <span class="num">2</span>, <span class="st">"B+"</span>],
+]
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"students.csv"</span>, <span class="st">'w'</span>, newline=<span class="st">''</span>) <span class="kw">as</span> f:
+    writer = csv.<span class="fn">writer</span>(f)
+    writer.<span class="fn">writerow</span>(data[<span class="num">0</span>])       <span class="cm"># Write header row</span>
+    writer.<span class="fn">writerows</span>(data[<span class="num">1</span>:])     <span class="cm"># Write all data rows at once</span></code></pre>
+</div>
+
+<!-- 3.4 Reading -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-green"></span>Reading from a CSV File</h3>
+  <p>Create a <strong>reader object</strong>, then iterate over it with a <code>for</code> loop. Each row is returned as a <strong>List of strings</strong>.</p>
+
+  <div class="callout callout-warning">
+    <div class="callout-title">⚠ Data Type Warning</div>
+    <p>CSV always returns data as <strong>strings</strong>. If you need to do arithmetic, convert first: <code>int(row[1])</code>, <code>float(row[2])</code>. Forgetting this is a very common exam mistake.</p>
+  </div>
+
+  <div class="pre-label">Read example with calculation</div>
+  <pre><code><span class="kw">import</span> csv
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="st">"marks.csv"</span>, <span class="st">'r'</span>) <span class="kw">as</span> f:
+    reader = csv.<span class="fn">reader</span>(f)
+    <span class="kw">for</span> row <span class="kw">in</span> reader:
+        <span class="fn">print</span>(row)                          <span class="cm"># Each row is a List</span>
+        total = <span class="fn">int</span>(row[<span class="num">1</span>]) + <span class="fn">int</span>(row[<span class="num">2</span>])  <span class="cm"># Must convert to int</span>
+        <span class="fn">print</span>(<span class="st">"Total:"</span>, total)</code></pre>
+</div>
+
+<!-- 3.5 Common Patterns -->
+<div class="subsection">
+  <h3 class="subsection-title"><span class="dot dot-green"></span>Common Logic Patterns</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Task</th><th>Pattern</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Count records</td>
+          <td>Init counter = 0; increment inside the <code>for</code> loop</td>
+        </tr>
+        <tr>
+          <td>Search</td>
+          <td>Check <code>if row[i] == target</code> inside the loop</td>
+        </tr>
+        <tr>
+          <td>Sum / Average</td>
+          <td>Convert field: <code>int(row[i])</code> or <code>float(row[i])</code> before adding</td>
+        </tr>
+        <tr>
+          <td>Skip header</td>
+          <td>Call <code>next(reader)</code> once before the loop, or use index slicing</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────── -->
+<!-- MASTER COMPARISON TABLE -->
+<!-- ─────────────────────────────────────────── -->
+<hr class="divider">
+<div class="subsection">
+  <h3 class="subsection-title" style="font-size:20px;color:var(--text)">
+    <span class="dot" style="width:10px;height:10px;background:var(--purple);border-radius:50%;display:inline-block"></span>
+    Master Comparison Table
+  </h3>
+  <p>Quick reference for the <em>three file types</em> — most likely to appear in exam theory questions.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Text File</th>
+          <th>Binary File</th>
+          <th>CSV File</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Extension</td>
+          <td><code>.txt</code></td>
+          <td><code>.dat</code></td>
+          <td><code>.csv</code></td>
+        </tr>
+        <tr>
+          <td>Human readable</td>
+          <td>✅ Yes</td>
+          <td>❌ No</td>
+          <td>✅ Yes</td>
+        </tr>
+        <tr>
+          <td>EOL translation</td>
+          <td>Yes</td>
+          <td>No</td>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <td>Module needed</td>
+          <td>None (built-in)</td>
+          <td><code>pickle</code></td>
+          <td><code>csv</code></td>
+        </tr>
+        <tr>
+          <td>Store Python objects</td>
+          <td>Manual conversion needed</td>
+          <td>Yes, directly</td>
+          <td>Strings only (manual conversion)</td>
+        </tr>
+        <tr>
+          <td>Write function</td>
+          <td><code>write()</code>, <code>writelines()</code></td>
+          <td><code>pickle.dump()</code></td>
+          <td><code>writerow()</code>, <code>writerows()</code></td>
+        </tr>
+        <tr>
+          <td>Read function</td>
+          <td><code>read()</code>, <code>readlines()</code></td>
+          <td><code>pickle.load()</code></td>
+          <td><code>for row in reader</code></td>
+        </tr>
+        <tr>
+          <td>EOF handling</td>
+          <td>Empty string / <code>for</code> loop</td>
+          <td><strong>try…except EOFError</strong></td>
+          <td>Loop ends naturally</td>
+        </tr>
+        <tr>
+          <td>Mode suffix</td>
+          <td><code>r</code>, <code>w</code>, <code>a</code> …</td>
+          <td><code>rb</code>, <code>wb</code>, <code>ab</code> …</td>
+          <td><code>r</code>, <code>w</code> (+ <code>newline=''</code>)</td>
+        </tr>
+        <tr>
+          <td>Use case</td>
+          <td>Logs, configs, plain text</td>
+          <td>Complex objects, dicts, lists</td>
+          <td>Tabular / spreadsheet data</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Quick Exam Tips -->
+<div class="summary-strip" style="margin-top:40px">
+  <h4>⚡ Exam Quick-Fire Reminders</h4>
+  <div class="strip-row">
+    <div class="strip-item"><code>write()</code><span class="arr">→</span>does NOT add <code>\n</code></div>
+    <div class="strip-item"><code>writelines()</code><span class="arr">→</span>does NOT add <code>\n</code></div>
+    <div class="strip-item"><code>readlines()</code><span class="arr">→</span>returns a <strong>List</strong></div>
+    <div class="strip-item"><code>'w'</code> mode<span class="arr">→</span>truncates immediately</div>
+    <div class="strip-item"><code>'a+'</code><span class="arr">→</span>use <code>seek(0)</code> to read</div>
+    <div class="strip-item"><code>EOFError</code><span class="arr">→</span>only in binary files</div>
+    <div class="strip-item">CSV data<span class="arr">→</span>always strings, convert for math</div>
+    <div class="strip-item"><code>newline=''</code><span class="arr">→</span>only when writing CSV</div>
+    <div class="strip-item">Update/Delete<span class="arr">→</span>temp file method</div>
+  </div>
+</div>
+
+</main>
+</body>
+</html>
