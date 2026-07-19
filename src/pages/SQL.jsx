@@ -4,7 +4,7 @@ import ChapterFooterNav from '../components/ChapterFooterNav'
 import CodeBlock from '../components/CodeBlock'
 import { ERD, JoinVenn, OutputTable } from '../components/SqlViz'
 import JoinPlayground from '../components/JoinPlayground'
-import { Section, Subsection, Callout, CardGrid, Card, Compare, CompareCard, TableWrap, SummaryStrip } from '../components/Content'
+import { Section, Subsection, Callout, CardGrid, Card, Compare, CompareCard, TableWrap, SummaryStrip, Steps } from '../components/Content'
 
 const PILLS = [
   { id: 'database-concepts', icon: '🗄️', label: 'Database & DBMS' },
@@ -188,14 +188,12 @@ export default function SQL() {
             <CodeBlock lang="sql" label="Create / select / show / drop a database" code={`CREATE DATABASE xyz;
 USE xyz;
 SHOW DATABASES;
-DROP DATABASE xyz;`} />
-            <TableWrap
-              head={['Command', 'Purpose']}
-              rows={[
-                ['<code>CREATE DATABASE</code>', 'Creates a database.'],
-                ['<code>USE</code>', 'Selects the database to work with — every command after this runs inside it.'],
-                ['<code>SHOW DATABASES</code>', 'Lists databases on the server.'],
-                ['<code>DROP DATABASE</code>', 'Permanently removes the named database, including every table inside it.'],
+DROP DATABASE xyz;`}
+              notes={[
+                { match: 'CREATE DATABASE xyz', note: 'Creates a new, empty database named xyz.' },
+                { match: 'USE xyz', note: 'Selects xyz as the database to work with — every command after this runs inside it.' },
+                { match: 'SHOW DATABASES', note: 'Lists every database on the server.' },
+                { match: 'DROP DATABASE xyz', note: 'Permanently removes xyz, including every table inside it.' },
               ]}
             />
           </Subsection>
@@ -248,7 +246,14 @@ ALTER TABLE customers DROP remarks;
 ALTER TABLE Persons ADD PRIMARY KEY (ID);
 
 -- Remove a primary key
-ALTER TABLE Persons DROP PRIMARY KEY;`} />
+ALTER TABLE Persons DROP PRIMARY KEY;`}
+              notes={[
+                { match: 'ALTER TABLE employee ADD date_join DATE', note: 'Every existing employee row instantly gets a new date_join column, value NULL, since nothing was specified for rows that already exist.' },
+                { match: 'ALTER TABLE customers ADD (phone_no INTEGER, remarks VARCHAR(250))', note: 'Parentheses let you add several columns in a single ALTER statement instead of writing one ALTER per column.' },
+                { match: 'ALTER TABLE customers DROP remarks', note: 'Removes the column entirely, along with whatever data it held in every row — not reversible.' },
+                { match: 'ALTER TABLE Persons ADD PRIMARY KEY (ID)', note: "Retroactively makes ID the primary key of a table that already exists — every value in ID must already be unique and non-NULL, or this fails." },
+              ]}
+            />
             <p style={{ fontSize: 13 }}><code>ALTER TABLE</code> always names the table first, then one instruction: <code>ADD</code> a column (or several, in parentheses), <code>DROP</code> a column, or add/drop constraints like <code>PRIMARY KEY</code>. Nothing about the existing data changes — new columns just start out <code>NULL</code> for every existing row.</p>
           </Subsection>
 
@@ -299,7 +304,12 @@ ALTER TABLE Persons DROP PRIMARY KEY;`} />
             />
             <CodeBlock lang="sql" label="Named columns — values in the same order as named" code={`INSERT INTO customers
 (name, date_of_birth, cust_id, age, phone_no, address, email)
-VALUES ('XYZ', '1999/09/25', 201, 17, 123456, 'EAST STREET', 'XYZ@YAHOO.COM');`} />
+VALUES ('XYZ', '1999/09/25', 201, 17, 123456, 'EAST STREET', 'XYZ@YAHOO.COM');`}
+              notes={[
+                { match: '(name, date_of_birth, cust_id, age, phone_no, address, email)', note: 'This column list can be in ANY order you like — it does not have to match how the table was originally created.' },
+                { match: "VALUES ('XYZ', '1999/09/25', 201, 17, 123456, 'EAST STREET', 'XYZ@YAHOO.COM')", note: 'The values just have to line up with the column list directly above, position for position.' },
+              ]}
+            />
             <Callout type="note" title="Note">
               Naming columns explicitly (second form) lets you list them in <strong>any</strong> order, as long as <code>VALUES</code> follows that same order. Columns left unnamed are simply not included in that statement (they'll be <code>NULL</code> or their default).
             </Callout>
@@ -390,7 +400,14 @@ WHERE Title = 'Mr'
 GROUP BY Town;
 
 SELECT AVG(Numbers), AVG(DISTINCT Numbers)
-FROM CLIENTS;`} />
+FROM CLIENTS;`}
+              notes={[
+                { match: "WHERE Title = 'Mr'", note: 'This runs FIRST — throwing away every non-"Mr" row before any grouping happens at all.' },
+                { match: 'GROUP BY Town', note: 'Only after filtering: collapse whatever rows are left into one row per distinct Town.' },
+                { match: 'COUNT(*)', note: 'Counts how many rows landed in each Town group — the (*) means "count rows", not any particular column.' },
+                { match: 'AVG(DISTINCT Numbers)', note: 'Duplicate values are counted once each before averaging — different from plain AVG(Numbers), which uses every row.' },
+              ]}
+            />
             <p>On our <code>employee</code> table, the same pattern — group by department, count rows per group — looks like this:</p>
             <CodeBlock lang="sql" code={`SELECT department, COUNT(*), AVG(salary)
 FROM employee
@@ -445,7 +462,13 @@ GROUP BY department;`} />
 SELECT * FROM foods CROSS JOIN company;
 
 SELECT F.item_name, F.item_unit, C.company_name, C.company_city
-FROM foods F, company C;`} />
+FROM foods F, company C;`}
+              notes={[
+                { match: 'SELECT * FROM foods, company;', note: 'Just listing two tables separated by a comma, with no WHERE at all, is enough to trigger a cross join — this is the classic "accidental cross join" bug when a join condition is forgotten.' },
+                { match: 'SELECT * FROM foods CROSS JOIN company;', note: 'The explicit, intentional way to write the exact same thing — clearer to read, same result.' },
+                { match: 'FROM foods F, company C', note: 'F and C are aliases, declared right where each table is named — used below to prefix the column list.' },
+              ]}
+            />
             <OutputTable
               caption="SELECT * FROM foods CROSS JOIN company;  (first 4 of 12 rows shown)"
               head={['item_name', 'foods.company_id', 'company_name']}
@@ -491,7 +514,11 @@ WHERE cust.account = bal.account_num;`}
             <p>A natural join does the same "only matching rows" filtering as an equi-join, but automatically — it compares <strong>every</strong> column that has the <strong>same name</strong> in both tables (here, that's <code>company_id</code>), and shows that shared column only once in the result.</p>
             <CodeBlock lang="sql" code={`SELECT *
 FROM foods
-NATURAL JOIN company;`} />
+NATURAL JOIN company;`}
+              notes={[
+                { match: 'NATURAL JOIN', note: "No condition written anywhere — MySQL scans both tables' column names itself and matches on whichever ones are identical (here, company_id)." },
+              ]}
+            />
             <JoinVenn leftLabel="foods" rightLabel="company" mode="equi" leftColor="blue" rightColor="green"
               note="Matches automatically on the shared column name (company_id) — no WHERE needed." />
             <OutputTable
@@ -538,19 +565,13 @@ mycur = db.cursor()`}
                 { match: 'db.cursor()', note: 'Creates a cursor — think of it as the "pointer" you send SQL commands through and read results back from.' },
               ]}
             />
-            <TableWrap
-              head={['Item', 'Use']}
-              rows={[
-                ['<code>mysql.connector</code>', 'Module used for MySQL connectivity.'],
-                ['<code>connect()</code>', 'Establishes the connection — host, user, <code>passwd</code>, database.'],
-                ['<code>cursor()</code>', 'Creates a cursor object used to execute SQL statements.'],
-                ['<code>execute()</code>', 'Executes an SQL command — can take the command plus a tuple of values.'],
-                ['<code>commit()</code>', 'Used after insert, update or delete operations.'],
-                ['<code>close()</code>', 'Closes the cursor, then the database connection.'],
+            <CodeBlock code={`mycur.close()
+db.close()`}
+              notes={[
+                { match: 'mycur.close()', note: 'Closes the cursor first — it can no longer send commands after this.' },
+                { match: 'db.close()', note: 'Then closes the underlying connection to the server. execute() and commit() are covered where they\'re first used, just below.' },
               ]}
             />
-            <CodeBlock code={`mycur.close()
-db.close()`} />
           </Subsection>
 
           <Subsection title="Insert, Update & Delete Using a Cursor" color="green">
@@ -591,7 +612,12 @@ db.commit()`} />
             <CodeBlock label="Fetch all records" code={`mycur.execute("SELECT * FROM student")
 records = mycur.fetchall()
 for row in records:
-    print(row)`} />
+    print(row)`}
+              notes={[
+                { match: 'records = mycur.fetchall()', note: 'Grabs every remaining row from the result at once, as a list of tuples — nothing is left to fetch after this line runs.' },
+                { match: 'for row in records:', note: "Each row here is one tuple — exactly what a single fetchone() call would have returned, just already collected into a list." },
+              ]}
+            />
             <CodeBlock label="Fetch one record repeatedly" code={`record = mycur.fetchone()
 while record is not None:
     print(record)
@@ -625,18 +651,15 @@ mydb.commit()`}
 
           <Subsection title="Pattern for a Database-Connectivity Application" color="green">
             <p>Every add/update/delete/display menu program in the syllabus follows the same seven-step skeleton:</p>
-            <TableWrap
-              head={['#', 'Step', 'Why']}
-              rows={[
-                ['1', '<code>mys.connect()</code>', 'Open the connection'],
-                ['2', '<code>cursor()</code>', 'Get a way to send commands'],
-                ['3', 'Read required input', 'Gather what the user typed'],
-                ['4', 'Build and execute the SQL command', 'Actually run the operation'],
-                ['5', '<code>commit()</code>', 'Only for insert/update/delete — makes it permanent'],
-                ['6', '<code>fetchone()</code> / <code>fetchall()</code>', "Only for <code>SELECT</code> — read the result back"],
-                ['7', 'Close cursor and connection', 'Free up resources'],
-              ]}
-            />
+            <Steps items={[
+              '<code>mys.connect()</code> — open the connection',
+              '<code>cursor()</code> — get a way to send commands',
+              'Read required input — gather what the user typed',
+              'Build and execute the SQL command — actually run the operation',
+              '<code>commit()</code> — only for insert/update/delete, makes it permanent',
+              '<code>fetchone()</code> / <code>fetchall()</code> — only for <code>SELECT</code>, reads the result back',
+              'Close cursor and connection — free up resources',
+            ]} />
           </Subsection>
         </Section>
 

@@ -194,7 +194,12 @@ export default function DataStructures() {
     else:
         # Iterates from the last index (-1) to the first
         for I in range(-1, -1 * len(L) - 1, -1):
-            print(L[I], end=" ")`} />
+            print(L[I], end=" ")`}
+              notes={[
+                { match: 'range(-1, -1 * len(L) - 1, -1)', note: 'Start at -1 (the last element), stop just before -len(L)-1 (one step past the first element), moving backward by -1 each time. This visits every index from last to first.' },
+                { match: 'L[I]', note: 'Negative indices count from the end in Python — L[-1] is the top of the stack, L[-2] the one below it, and so on.' },
+              ]}
+            />
           </Subsection>
         </Section>
 
@@ -214,7 +219,12 @@ export default function DataStructures() {
         if Ditem[key] > 75:  # Condition (e.g., price > 75)
             L.append(key)
             count += 1
-    print("The count of elements in the stack is", count)`} />
+    print("The count of elements in the stack is", count)`}
+              notes={[
+                { match: 'for key in Ditem:', note: 'Looping over a dictionary by default walks through its keys — Ditem[key] is how you reach the matching value.' },
+                { match: 'count += 1', note: 'Only reached when a key actually gets pushed — so count ends up tracking exactly how many were pushed, not how many were checked.' },
+              ]}
+            />
           </Subsection>
 
           <Subsection title="Calculated Fields" color="teal">

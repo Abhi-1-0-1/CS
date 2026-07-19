@@ -304,24 +304,25 @@ pre code { background: none; padding: 0; border-radius: 0; color: var(--text); f
   border-bottom-color: var(--blue);
   outline: none;
 }
+.note-tooltip-anchor {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 10px));
+  z-index: 3000;
+  pointer-events: none;
+}
 .note-tooltip {
-  position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%);
   width: max-content; max-width: 280px;
   background: var(--surface3); border: 1px solid var(--border2); border-radius: 10px;
   padding: 10px 13px; font-family: 'Outfit', sans-serif; font-size: 12.5px; line-height: 1.5;
   color: var(--text); white-space: normal; font-style: normal; font-weight: 400;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.4);
-  z-index: 40;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+  position: relative;
 }
 .note-tooltip::after {
   content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
   border: 6px solid transparent; border-top-color: var(--surface3);
 }
 .note-tooltip code { background: var(--surface); }
-@media (max-width: 480px) {
-  .note-tooltip { left: 0; transform: none; max-width: 220px; }
-  .note-tooltip::after { left: 20px; transform: none; }
-}
 .code-legend {
   display: flex; align-items: center; gap: 7px;
   font-size: 11px; color: var(--dim); margin-top: 10px;

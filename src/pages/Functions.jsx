@@ -60,7 +60,12 @@ export default function Functions() {
     result = 1
     for i in range(1, n + 1):
         result *= i
-    return result                    # Returns an integer`} />
+    return result                    # Returns an integer`}
+              notes={[
+                { match: 'return "Invalid argument"', note: 'This return ends the function immediately — the loop below never runs for negative n.' },
+                { match: 'return result', note: 'A second, completely different return type (int) further down the same function — Python allows this freely.' },
+              ]}
+            />
           </Subsection>
         </Section>
 
@@ -110,20 +115,22 @@ greet("Alice", "Hi")    # Overrides default → "Hi Alice"`}
             />
             <Callout type="danger" title="Critical Order Rule">Non-keyword arguments cannot follow keyword arguments in a function call.</Callout>
             <CodeBlock label="Wrong vs correct" code={`student(firstname='John', 'Seventh')  # ❌ SyntaxError
-student('John', grade='Seventh')          # ✅ Correct`} />
+student('John', grade='Seventh')          # ✅ Correct`}
+              notes={[
+                { match: "firstname='John', 'Seventh'", note: "'Seventh' has no name attached, but it comes after a named argument — Python can't tell which parameter it belongs to, so it refuses to run at all." },
+              ]}
+            />
           </Subsection>
 
           <Subsection title="3.4 Arbitrary Arguments (Variable-Length)" color="purple">
-            <TableWrap
-              head={['Syntax', 'Type Stored', 'Description']}
-              rows={[
-                ['<code>*args</code>', 'Tuple', 'Accepts any number of non-keyword arguments'],
-                ['<code>**kwargs</code>', 'Dictionary', 'Accepts any number of keyword arguments'],
-              ]}
-            />
             <CodeBlock label="Example" code={`def show_args(*args, **kwargs):
     print(args)     # ('a', 'b', 'c') → Tuple
-    print(kwargs)   # {'x': 1, 'y': 2} → Dictionary`} />
+    print(kwargs)   # {'x': 1, 'y': 2} → Dictionary`}
+              notes={[
+                { match: '*args', note: 'Collects any number of extra positional (non-keyword) arguments into a tuple.' },
+                { match: '**kwargs', note: 'Collects any number of extra keyword arguments into a dictionary.' },
+              ]}
+            />
           </Subsection>
 
           <Subsection title="3.5 Summary — Argument Types" color="purple">
@@ -199,7 +206,11 @@ def modify():
     G = G + 10     # ✅ Works fine
 
 modify()
-print(G)  # 20`} />
+print(G)  # 20`}
+              notes={[
+                { match: 'global G', note: 'Without this line, the G = G + 10 below would create a brand-new local G instead of touching the outer one.' },
+              ]}
+            />
           </Subsection>
 
           <Subsection title={<><code>UnboundLocalError</code> — A Common Exam Trap</>} color="purple">
@@ -236,14 +247,6 @@ def subtract(a, b):
     return a - b`} />
           </Subsection>
           <Subsection title="Import Methods" color="purple">
-            <TableWrap
-              head={['Import Style', 'Syntax', 'How to Call']}
-              rows={[
-                ['Standard', '<code>import CALC</code>', '<code>CALC.add()</code>'],
-                ['Alias', '<code>import CALC as CA</code>', '<code>CA.add()</code>'],
-                ['Selective', '<code>from CALC import add</code>', '<code>add()</code> directly'],
-              ]}
-            />
             <CodeBlock label="All three methods" code={`# Method 1 — Standard
 import CALC
 CALC.add(5, 3)
@@ -255,7 +258,14 @@ CA.add(5, 3)
 # Method 3 — Selective
 from CALC import add
 add(5, 3)        # ✅ Works
-subtract(5, 3)   # ❌ "Function not found" — not imported!`} />
+subtract(5, 3)   # ❌ "Function not found" — not imported!`}
+              notes={[
+                { match: 'import CALC\nCALC.add(5, 3)', note: 'Standard import — every function must be reached through CALC. prefix.' },
+                { match: 'import CALC as CA', note: 'Alias import — CALC is nicknamed CA, so CA.add() works instead of the longer CALC.add().' },
+                { match: 'from CALC import add', note: 'Selective import — only add itself is pulled in, callable directly with no prefix at all.' },
+                { match: 'subtract(5, 3)   # ❌ "Function not found" — not imported!', note: 'subtract was never imported by name in Method 3, so Python has no idea what this word refers to.' },
+              ]}
+            />
             <Callout type="warning" title="Watch Out">
               If you use <code>from CALC import add</code> and then try to call <code>subtract()</code>, it results in a <strong>"Function not found"</strong> error — selective import only brings in what you named.
             </Callout>
@@ -291,13 +301,23 @@ print(round(area, 2))  # e.g., 78.54`} />
     for char in 'abcdefghijklmnopqrstuvwxyz':
         if char not in sentence:
             return False
-    return True`} />
+    return True`}
+              notes={[
+                { match: 'sentence = sentence.lower()', note: "Normalises case first, so 'A' and 'a' count as the same letter when checking." },
+                { match: "for char in 'abcdefghijklmnopqrstuvwxyz':", note: 'Loops through the alphabet itself, not the sentence — checking "is this letter present?" 26 times.' },
+                { match: 'return False', note: 'Exits immediately the moment a single missing letter is found — no need to check the rest.' },
+              ]}
+            />
             <CodeBlock label="Distinct elements example" code={`def get_distinct(lst):
     new_list = []
     for elem in lst:
         if elem not in new_list:
             new_list.append(elem)
-    return new_list`} />
+    return new_list`}
+              notes={[
+                { match: 'if elem not in new_list:', note: 'The whole trick — before adding, check whether it\'s already there. This is what keeps duplicates out.' },
+              ]}
+            />
           </Subsection>
         </Section>
 

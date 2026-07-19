@@ -48,7 +48,11 @@ file_obj.close()   # Always close to free memory`} />
             </Callout>
             <CodeBlock label="Using the with clause" code={`with open("data.txt", "r") as f:
     content = f.read()
-# File is automatically closed here — no need for f.close()`} />
+# File is automatically closed here — no need for f.close()`}
+              notes={[
+                { match: 'with open("data.txt", "r") as f:', note: 'f only exists inside this indented block. The moment the block ends — even via an exception — Python calls f.close() for you automatically.' },
+              ]}
+            />
           </Subsection>
 
           <Subsection title="File Access Modes" color="blue">
@@ -195,7 +199,13 @@ def DisplayAll():
         except EOFError:
             pass
     if not found:
-        print("Record not found")`} />
+        print("Record not found")`}
+              notes={[
+                { match: 'found = False', note: 'A flag that starts "not found" and only flips to True if a match actually turns up during the scan.' },
+                { match: 'if R["roll"] == target:', note: 'Checked once per record — there\'s no way to "look up" a record directly, you have to compare every single one.' },
+                { match: 'if not found:', note: 'Runs after the whole file has been scanned — this is how the function knows whether to report "not found".' },
+              ]}
+            />
 
             <p style={{ marginTop: 20 }}>
               <span className="badge badge-amber" style={{ marginRight: 6 }}>Update</span>
@@ -229,7 +239,14 @@ def Delete(target_roll):
 
     # Step 3: Replace original
     os.remove("student.dat")
-    os.rename("temp.dat", "student.dat")`} />
+    os.rename("temp.dat", "student.dat")`}
+              notes={[
+                { match: 'records.append(pickle.load(f))', note: 'Pulls every record out of the file into a plain Python list first, so it can be filtered in memory — you can\'t delete "in place" inside a binary file.' },
+                { match: 'if R["roll"] != target_roll:', note: 'The actual "delete" — records that don\'t match get written to temp.dat; the one that does match is simply skipped and never written back.' },
+                { match: 'os.remove("student.dat")', note: 'Deletes the old file entirely...' },
+                { match: 'os.rename("temp.dat", "student.dat")', note: '...then renames temp.dat to take its place, so the filename students.dat still works everywhere else in the program.' },
+              ]}
+            />
           </Subsection>
         </Section>
 
@@ -276,7 +293,13 @@ data = [
 with open("students.csv", 'w', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(data[0])       # Write header row
-    writer.writerows(data[1:])     # Write all data rows at once`} />
+    writer.writerows(data[1:])     # Write all data rows at once`}
+              notes={[
+                { match: "newline=''", note: 'Prevents the extra blank line between rows that Windows would otherwise insert — always include this when writing a CSV.' },
+                { match: 'writer.writerow(data[0])', note: 'data[0] is just the header list — written on its own since it needs to come first.' },
+                { match: 'writer.writerows(data[1:])', note: 'data[1:] is every row except the header — writerows (plural) writes a whole list of lists in one call.' },
+              ]}
+            />
           </Subsection>
 
           <Subsection title="Reading from a CSV File" color="green">
@@ -291,7 +314,12 @@ with open("marks.csv", 'r') as f:
     for row in reader:
         print(row)                          # Each row is a List
         total = int(row[1]) + int(row[2])   # Must convert to int
-        print("Total:", total)`} />
+        print("Total:", total)`}
+              notes={[
+                { match: 'for row in reader:', note: 'Each row comes out as a list of strings — even columns that "look like" numbers.' },
+                { match: 'total = int(row[1]) + int(row[2])', note: "row[1] and row[2] are strings like '10', not the number 10 — without int(), + would just glue the text together instead of adding." },
+              ]}
+            />
           </Subsection>
 
           <Subsection title="Common Logic Patterns" color="green">
